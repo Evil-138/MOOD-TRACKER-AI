@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AI Mood Tracker{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <div class="dashboard-header">
+        <h1 class="page-title">
+            <span class="title-icon">📊</span>
+            Your Mood Dashboard
+        </h1>
+        <div class="header-actions">
+            <button onclick="exportData('csv')" class="btn btn-export">
+                📥 Export CSV
+            </button>
+            <button onclick="exportData('json')" class="btn btn-export">
+                📥 Export JSON
+            </button>
+        </div>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="summary-section">
+        <div class="summary-card">
+            <div class="summary-icon">📝</div>
+            <div class="summary-content">
+                <div class="summary-number">{{ total_entries }}</div>
+                <div class="summary-label">Total Entries</div>
+            </div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">🎯</div>
+            <div class="summary-content">
+                <div class="summary-number">{{ (total_entries / 30) | round(1) }}</div>
+                <div class="summary-label">Avg/Month</div>
+            </div>
+        </div>
+        
+        <div class="summary-card highlight">
+            <div class="summary-icon">✨</div>
+            <div class="summary-content">
+                <div class="summary-text">{{ summary }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mood Distribution -->
+    <div class="chart-section">
+        <div class="chart-container">
+            <h2 class="chart-title">Mood Distribution</h2>
+            <canvas id="moodPieChart"></canvas>
+        </div>
+        
+        <!-- Mood Trend -->
+        <div class="chart-container full-width">
+            <h2 class="chart-title">Mood Trend Over Time</h2>
+            <div id="moodTrendChart"></div>
+        </div>
+    </div>
+    
+    <!-- Recent Entries -->
+    <div class="entries-section">
+        <h2 class="section-title">Recent Journal Entries</h2>
+        
+        {% if entries %}
+        <div class="entries-grid">
+            {% for entry in entries %}
+            <div class="entry-card">
+                <div class="entry-header">
+                    <div class="entry-emoji">{{ entry.emoji }}</div>
+                    <div class="entry-meta">
+                        <div class="entry-mood">{{ entry.mood }}</div>
+                        <div class="entry-date">{{ entry.date }}</div>
+                    </div>
+                </div>
+                <div class="entry-text">
+                    {{ entry.entry_text[:150] }}{% if entry.entry_text|length > 150 %}...{% endif %}
+                </div>
+                <div class="entry-footer">
+                    <span class="entry-score">Confidence: {{ "%.0f"|format(entry.mood_score * 100) }}%</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>No entries yet</h3>
+            <p>Start journaling to see your mood analytics!</p>
+            <a href="/add-entry" class="btn btn-primary">Create Your First Entry</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.dashboard-page {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-export {
+    background: rgba(0, 245, 255, 0.1);
+    color: #00f5ff;
+    border: 1px solid #00f5ff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-export:hover {
+    background: rgba(0, 245, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.summary-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.summary-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    border-color: #00f5ff;
+    box-shadow: 0 10px 30px rgba(0, 245, 255, 0.2);
+}
+
+.summary-card.highlight {
+    grid-column: span 1;
+    background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 255, 0.1));
+    border: 2px solid rgba(255, 0, 255, 0.5);
+}
+
+.summary-icon {
+    font-size: 3rem;
+}
+
+.summary-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00f5ff, #ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.summary-label {
+    color: #b0b0b0;
+    margin-top: 0.5rem;
+}
+
+.summary-text {
+    color: #ffffff;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.chart-section {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+}
+
+.chart-container.full-width {
+    grid-column: span 2;
+}
+
+.chart-title {
+    color: #00f5ff;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+}
+
+.entries-section {
+    margin-top: 3rem;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    color: #00f5ff;
+    margin-bottom: 1.5rem;
+}
+
+.entries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.entry-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.entry-card:hover {
+    transform: translateY(-5px);
+    border-color: #ff00ff;
+    box-shadow: 0 10px 25px rgba(255, 0, 255, 0.2);
+}
+
+.entry-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.entry-emoji {
+    font-size: 2.5rem;
+}
+
+.entry-meta {
+    flex: 1;
+}
+
+.entry-mood {
+    color: #00f5ff;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.entry-date {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+
+.entry-text {
+    color: #e0e0e0;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.entry-footer {
+    border-top: 1px solid rgba(0, 245, 255, 0.1);
+    padding-top: 1rem;
+}
+
+.entry-score {
+    color: #ff00ff;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #00f5ff;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #b0b0b0;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .chart-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container.full-width {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .entries-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Mood distribution pie chart
+const moodCounts = {{ mood_counts | tojson }};
+
+const ctx = document.getElementById('moodPieChart').getContext('2d');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(moodCounts),
+        datasets: [{
+            data: Object.values(moodCounts),
+            backgroundColor: [
+                'rgba(0, 245, 255, 0.8)',
+                'rgba(255, 0, 255, 0.8)',
+                'rgba(0, 255, 128, 0.8)',
+                'rgba(255, 128, 0, 0.8)',
+                'rgba(128, 0, 255, 0.8)',
+                'rgba(255, 255, 0, 0.8)',
+                'rgba(255, 0, 128, 0.8)'
+            ],
+            borderColor: '#0f0f1e',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#00f5ff',
+                    font: {
+                        size: 12,
+                        family: 'Poppins'
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Mood trend chart (Plotly)
+const chartData = {{ chart_data | safe }};
+if (chartData && Object.keys(chartData).length > 0) {
+    Plotly.newPlot('moodTrendChart', chartData.data, chartData.layout, {
+        responsive: true,
+        displayModeBar: false
+    });
+}
+
+// Export functionality
+function exportData(format) {
+    window.location.href = `/api/export/${format}`;
+}
+</script>
+{% endblock %}

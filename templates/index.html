@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AI Mood Tracker{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            Welcome to <span class="gradient-text">MoodFlow</span>
+        </h1>
+        <p class="hero-subtitle">
+            Your AI-powered companion for emotional wellness and self-discovery
+        </p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI-Powered Analysis</h3>
+                <p>Advanced sentiment analysis detects your emotions automatically</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Visual Insights</h3>
+                <p>Beautiful charts reveal your emotional patterns over time</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3>Smart Suggestions</h3>
+                <p>Get personalized motivational quotes based on your mood</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Private & Secure</h3>
+                <p>Your journal entries are stored safely and privately</p>
+            </div>
+        </div>
+        
+        <div class="cta-buttons">
+            <a href="/add-entry" class="btn btn-primary">
+                <span>Start Journaling</span>
+                <span class="btn-icon">✍️</span>
+            </a>
+            <a href="/dashboard" class="btn btn-secondary">
+                <span>View Dashboard</span>
+                <span class="btn-icon">📈</span>
+            </a>
+        </div>
+        
+        <div class="quick-stats">
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Private</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">AI</div>
+                <div class="stat-label">Powered</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Available</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="floating-emojis">
+        <span class="emoji-float" style="--delay: 0s; --x: 10%">😊</span>
+        <span class="emoji-float" style="--delay: 1s; --x: 80%">🌟</span>
+        <span class="emoji-float" style="--delay: 2s; --x: 30%">💙</span>
+        <span class="emoji-float" style="--delay: 3s; --x: 70%">🌈</span>
+        <span class="emoji-float" style="--delay: 4s; --x: 50%">✨</span>
+    </div>
+</div>
+
+<style>
+.hero-section {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    max-width: 1200px;
+    text-align: center;
+    z-index: 1;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.8s ease;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #00f5ff, #ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: #b0b0b0;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+    animation: fadeInUp 0.8s ease 0.4s both;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    border-color: #00f5ff;
+    box-shadow: 0 10px 30px rgba(0, 245, 255, 0.2);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    color: #00f5ff;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.feature-card p {
+    color: #b0b0b0;
+    line-height: 1.6;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin: 3rem 0;
+    animation: fadeInUp 0.8s ease 0.6s both;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #00f5ff, #ff00ff);
+    color: #0f0f1e;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 245, 255, 0.5);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: #00f5ff;
+    border: 2px solid #00f5ff;
+}
+
+.btn-secondary:hover {
+    background: rgba(0, 245, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.quick-stats {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    margin-top: 4rem;
+    animation: fadeInUp 0.8s ease 0.8s both;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00f5ff, #ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.floating-emojis {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.emoji-float {
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.2;
+    animation: float 6s ease-in-out infinite;
+    animation-delay: var(--delay);
+    left: var(--x);
+    bottom: -10%;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-100vh) rotate(360deg);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+    }
+    
+    .quick-stats {
+        gap: 2rem;
+    }
+}
+</style>
+{% endblock %}
