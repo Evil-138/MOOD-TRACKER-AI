@@ -152,7 +152,7 @@ def dashboard():
     
     # Get mood statistics
     all_entries = conn.execute(
-        'SELECT mood, date, mood_score FROM journal_entries ORDER BY date DESC'
+        'SELECT mood, date, mood_score, emoji FROM journal_entries ORDER BY date DESC'
     ).fetchall()
     
     conn.close()
@@ -304,11 +304,13 @@ def create_mood_chart(entries):
     if not entries:
         return json.dumps({})
     
-    # Prepare data
-    dates = [e['date'] for e in reversed(entries[-30:])]  # Last 30 days
-    scores = [e['mood_score'] for e in reversed(entries[-30:])]
-    moods = [e['mood'] for e in reversed(entries[-30:])]
-    emojis = [e.get('emoji', '😐') for e in reversed(entries[-30:])]
+    # Prepare data - convert Row objects to dicts
+    entries_list = [dict(e) for e in entries[-30:]]  # Last 30 days
+    
+    dates = [e['date'] for e in reversed(entries_list)]
+    scores = [e['mood_score'] for e in reversed(entries_list)]
+    moods = [e['mood'] for e in reversed(entries_list)]
+    emojis = [e.get('emoji', '😐') if isinstance(e, dict) else (e['emoji'] if e['emoji'] else '😐') for e in reversed(entries_list)]
     
     # Create hover text
     hover_text = [f"{mood} {emoji}<br>{date}" for date, mood, emoji in zip(dates, moods, emojis)]

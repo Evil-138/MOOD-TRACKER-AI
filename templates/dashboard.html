@@ -329,51 +329,60 @@
 // Mood distribution pie chart
 const moodCounts = {{ mood_counts | tojson }};
 
-const ctx = document.getElementById('moodPieChart').getContext('2d');
-new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: Object.keys(moodCounts),
-        datasets: [{
-            data: Object.values(moodCounts),
-            backgroundColor: [
-                'rgba(0, 245, 255, 0.8)',
-                'rgba(255, 0, 255, 0.8)',
-                'rgba(0, 255, 128, 0.8)',
-                'rgba(255, 128, 0, 0.8)',
-                'rgba(128, 0, 255, 0.8)',
-                'rgba(255, 255, 0, 0.8)',
-                'rgba(255, 0, 128, 0.8)'
-            ],
-            borderColor: '#0f0f1e',
-            borderWidth: 2
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    color: '#00f5ff',
-                    font: {
-                        size: 12,
-                        family: 'Poppins'
+// Only create chart if there's data
+if (Object.keys(moodCounts).length > 0) {
+    const ctx = document.getElementById('moodPieChart');
+    if (ctx) {
+        new Chart(ctx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(moodCounts),
+                datasets: [{
+                    data: Object.values(moodCounts),
+                    backgroundColor: [
+                        'rgba(0, 245, 255, 0.8)',
+                        'rgba(255, 0, 255, 0.8)',
+                        'rgba(0, 255, 128, 0.8)',
+                        'rgba(255, 128, 0, 0.8)',
+                        'rgba(128, 0, 255, 0.8)',
+                        'rgba(255, 255, 0, 0.8)',
+                        'rgba(255, 0, 128, 0.8)'
+                    ],
+                    borderColor: '#0f0f1e',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#00f5ff',
+                            font: {
+                                size: 12,
+                                family: 'Poppins'
+                            }
+                        }
                     }
                 }
             }
-        }
+        });
     }
-});
+}
 
 // Mood trend chart (Plotly)
-const chartData = {{ chart_data | safe }};
-if (chartData && Object.keys(chartData).length > 0) {
-    Plotly.newPlot('moodTrendChart', chartData.data, chartData.layout, {
-        responsive: true,
-        displayModeBar: false
-    });
+try {
+    const chartData = {{ chart_data | safe }};
+    if (chartData && chartData.data && chartData.data.length > 0) {
+        Plotly.newPlot('moodTrendChart', chartData.data, chartData.layout, {
+            responsive: true,
+            displayModeBar: false
+        });
+    }
+} catch (error) {
+    console.log('No chart data available yet');
 }
 
 // Export functionality
